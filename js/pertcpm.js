@@ -22,37 +22,59 @@ var pertcpm = {
 			 ["input","text", "span1","col_cp_", "col_cp"],
 			 ],
 
+	graf : [],
 	//fungsi inisialisasi
 	init:function(){
 		this.addRow();
 
 		$("#edit_btn").hide();
+
+		console.log(this.graf);
 	},
 
 	//fungsi mengedit data kembali. Ditrigger ketika tombol edit diklik
 	edit:function(){
-		$("#tambah_btn").fadeIn();
-		$("#hitung_btn").fadeIn();
-		$(".col_ks")	.fadeIn();
-		$(".col_op")	.fadeIn();
-		$(".col_pr")	.fadeIn();
-		$(".col_pe")	.fadeIn();
+		/********* Memunculkan Tampilan  *********/
+		
+		$("#tabel").slideUp();
+
+		//menampilkan t, es, ef, ls, lf, sl, fs, cp hide dulu
+        $(".col_t"). hide();
+        $(".col_es").hide();
+        $(".col_ef").hide();
+        $(".col_ls").hide();
+        $(".col_lf").hide();
+        $(".col_sl").hide();
+        $(".col_fs").hide();
+        $(".col_cp").hide();
+
+        //menampilkan tombol edit
+        $("#edit_btn").hide();
+
+		/********* Menghilangkan Tampilan  *********/
+
+
+		$("#tabel").slideDown();
+
+		//menghilangkan tombol tambah
+		$("#tambah_btn").show();
+
+		//menghilangkan tombol hitung
+		$("#hitung_btn").show();
+
+		//menghilangkan kolom kegiatan sebelumnya
+		$(".col_ks").fadeIn();
+
+		//menghilangkan kolom optimis, probable, dan pesimis
+		$(".col_op").fadeIn();
+		$(".col_pr").fadeIn();
+		$(".col_pe").fadeIn();
 
 		//menghilangkan kolom hapus
 		$(".col_hapus").fadeIn();
-
-		//menampilkan t, es, ef, ls, lf, sl, fs, cp hide dulu
-        $(".col_t"). fadeOut();
-        $(".col_es").fadeOut();
-        $(".col_ef").fadeOut();
-        $(".col_ls").fadeOut();
-        $(".col_lf").fadeOut();
-        $(".col_sl").fadeOut();
-        $(".col_fs").fadeOut();
-        $(".col_cp").fadeOut();
-
-        //menampilkan tombol edit
-        $("#edit_btn").fadeOut();
+		
+		
+		
 	},
 	//fungsi menambah baris baru
 	addRow:function(){
@@ -135,6 +157,14 @@ var pertcpm = {
 
 	    						  console.log("edit " + i);		
 	            	}else{
+	            		var cell = row.cells[j];
+
+	            		var element = cell.getElementsByTagName('input')[0]; 
+
+						
+		            	element.id = this.kolom[i][3]+i;
+
+		            	element.title = "Tanggal " + this.kolom[i][3] + i;
 
 	            	}
 
@@ -153,24 +183,30 @@ var pertcpm = {
 
 		/********* Menghilangkan Tampilan  *********/
 
+
+		$("#tabel").slideUp();
+
 		//menghilangkan tombol tambah
-		$("#tambah_btn").fadeOut();
+		$("#tambah_btn").hide();
 
 		//menghilangkan tombol hitung
-		$("#hitung_btn").fadeOut();
+		$("#hitung_btn").hide();
 
 		//menghilangkan kolom kegiatan sebelumnya
-		$(".col_ks").fadeOut();
+		$(".col_ks").hide();
 
 		//menghilangkan kolom optimis, probable, dan pesimis
-		$(".col_op").fadeOut();
-		$(".col_pr").fadeOut();
-		$(".col_pe").fadeOut();
+		$(".col_op").hide();
+		$(".col_pr").hide();
+		$(".col_pe").hide();
 
 		//menghilangkan kolom hapus
-		$(".col_hapus").fadeOut();
-
+		$(".col_hapus").hide();
+		
 		/********* Memunculkan Tampilan  *********/
+		
+		$("#tabel").slideDown();
+
 		//menampilkan t, es, ef, ls, lf, sl, fs, cp hide dulu
         $(".col_t"). fadeIn();
         $(".col_es").fadeIn();
@@ -182,8 +218,8 @@ var pertcpm = {
         $(".col_cp").fadeIn();
 
         //menampilkan tombol edit
-        $("#edit_btn").fadeIn();
-
+        $("#edit_btn").show();
+		
 
         var table = document.getElementById("tabel");
         var rowCount = table.rows.length;
@@ -199,6 +235,8 @@ var pertcpm = {
         	pr = parseInt(pr);
         	pe = parseInt(pe);
 
+
+        	//menghitung t
         	var t_hasil = (op+(4*pr)+pe)/6;
         	console.log(t_hasil);
         	t.val(t_hasil);
