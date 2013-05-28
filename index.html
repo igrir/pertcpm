@@ -1,0 +1,87 @@
+<html>
+	<head>
+		<script type="text/javascript" src="js/jquery-1.10.0.min.js"></script>
+		<script type="text/javascript" src="js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="js/pertcpm.js"></script>
+		<script type="text/javascript" src="js/bootstrap-popover.js"></script>
+		<link rel="stylesheet" type="text/css" href="css/bootstrap-responsive.min.css"/>
+		<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+		<link rel="stylesheet" type="text/css" href="css/pertcpm.css"/>
+
+		<script type="text/javascript">
+			$(document).ready(function(){
+
+				pertcpm.init();
+
+			});
+		</script>
+
+	</head>
+	<body>
+		
+		<div class="container">
+			<div class="page-header">
+				<h1>ProCP<small> program penentuan pengerjaan proyek dengan metode PERT-CPM</small></h1>
+			</div>
+
+			<br/>
+
+			<table class="table table-condensed table-bordered table-hover table-striped" border="1" id="tabel">
+				<tr>
+					<td class="col_no">
+						id
+					</td>
+					<td class="col_nama">
+						Nama Kegiatan
+					</td>
+					<td class="col_ks">
+						Kegiatan sebelumnya<br/>
+						<small>(pisahkan dengan koma antar nomor id)</small>
+					</td>
+					<td class="col_op">
+						Optimis
+					</td>
+					<td class="col_pr">
+						Probable
+					</td>
+					<td class="col_pe">
+						Pesimis
+					</td>
+					<td class="col_hapus">
+						Hapus
+					</td>
+					<td class="col_t">
+						t
+					</td>
+					<td class="col_es">
+						ES
+					</td>
+					<td class="col_ef">
+						EF
+					</td>
+					<td class="col_ls">
+						LS
+					</td>
+					<td class="col_lf">
+						LF
+					</td>
+					<td class="col_sl">
+						SLACK
+					</td>
+					<td class="col_fs">
+						FREE SLACK
+					</td>
+					<td class="col_cp">
+						critical path?
+					</td>
+				</tr>
+			</table>
+
+			<button class="btn btn-success" onClick="pertcpm.addRow();" id="tambah_btn"><i class="icon-plus"></i> Tambah</button>
+			<button class="btn btn-warning" onClick="pertcpm.hitung();" id="hitung_btn"><i class="icon-fire"></i> Hitung</button>
+			<button class="btn btn-info"    onClick="pertcpm.edit();"   id="edit_btn"  ><i class="icon-edit"></i> Edit</button>
+		</div>
+
+	</body>
+
+</html>

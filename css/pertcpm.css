@@ -1,0 +1,7 @@
+.col_op{
+	-webkit-transition: width 0.5s;
+}
+
+.col_op:hover{
+	background-color: #df0000;
+}
