@@ -21,7 +21,7 @@ var pertcpm = {
 			 ["input","text", "span1","col_fs_", "col_fs"],
 			 ["input","text", "span1","col_cp_", "col_cp"],
 			 ],
-
+	indeks_graf :[],
 	graf : [],
 	//fungsi inisialisasi
 	init:function(){
@@ -221,14 +221,21 @@ var pertcpm = {
         $("#edit_btn").show();
 		
 
+        /********* Proses menghitung  *********/
+
         var table = document.getElementById("tabel");
         var rowCount = table.rows.length;
 
         for (i = 1; i < rowCount; i++) {
-        	var op = $("#col_op_"+i).val();
-        	var pr = $("#col_pr_"+i).val();	
-        	var pe = $("#col_pe_"+i).val();
-        	var t = $("#col_t_"+i);
+        	var op = $("#col_op_"+i).val();		//optimis
+        	var pr = $("#col_pr_"+i).val();		//probable
+        	var pe = $("#col_pe_"+i).val();		//pesimis
+        	var t = $("#col_t_"+i);				//waktu
+        	var ks = $("#col_ks_"+i);			//kegiatan sebelumnya
+        	var no = $("#col_no_"+i);			//id kegiatan
+        	var sl = $("#col_sl_"+i);			//slack
+        	var fs = $("#col_fs_"+i);			//free slack
+        	var cp = $("#col_cp_"+i);			//critical path
 
 
         	op = parseInt(op);
@@ -238,10 +245,95 @@ var pertcpm = {
 
         	//menghitung t
         	var t_hasil = (op+(4*pr)+pe)/6;
-        	console.log(t_hasil);
+        	// console.log(t_hasil);
         	t.val(t_hasil);
 
+        	// memproses indeks untuk array dua dimensi
+        	var idx = i-1; //indeks
+
+        	//membuat indeks baris
+        	this.indeks_graf[idx] = no.val();
         }
+
+        //membuat array dua dimensi yang kosong di graf
+        for (i = 0; i < rowCount-1; i++) {
+        	this.graf[i] = new Array();
+        	for (j = 0; j < rowCount-1; j++) {
+        		this.graf[i][j] = 0;
+        	}
+        }
+
+
+        //	memasukkan kegiatan sebelumnya ke dalam array
+    	// bentuk array dua dimensi adalah seperti ini
+    	//
+    	//   0 1 2 3
+    	// 0
+    	// 1
+    	// 2
+    	// 3
+    	//
+    	//	indeks_graf baris pertama berisi 0..n indeks baris
+    	for (i = 1; i < rowCount; i++) {
+    		var op = $("#col_op_"+i).val();		//optimis
+        	var pr = $("#col_pr_"+i).val();		//probable
+        	var pe = $("#col_pe_"+i).val();		//pesimis
+        	var t = $("#col_t_"+i);				//waktu
+        	var ks = $("#col_ks_"+i);			//kegiatan sebelumnya
+        	var no = $("#col_no_"+i);			//id kegiatan
+        	var sl = $("#col_sl_"+i);			//slack
+        	var fs = $("#col_fs_"+i);			//free slack
+        	var cp = $("#col_cp_"+i);			//critical path
+
+        	// memproses indeks untuk array dua dimensi
+        	var idx = i-1; //indeks
+
+        	// ubah node berspasi jadi array
+        	var arr_node = new Array();
+        	var ks_str = ks.val();
+        	var node = "";
+        	for (j=0; j <= ks_str.length ; j++ ) {
+        		if (ks_str[j] == " " || j == ks_str.length) {
+        			arr_node[arr_node.length] = node;
+        			node = "";
+        		}else{
+        			node += ks_str[j]
+        		}
+        	}
+
+        	//cari setiap indeks di arr_node di indeks_graf untuk dimasukkan ke dalam array dua dimensi graf
+        	for (j = 0; j < arr_node.length; j++) {
+        		var ketemu = false;
+	        	var iter = 0;
+	        	while (!ketemu && iter < this.indeks_graf.length) {
+
+	        		if (arr_node[j] == this.indeks_graf[iter]) {
+	        			ketemu = true;
+	        			//masukkan ke dalam graf statusnya 1
+	        			this.graf[idx][iter] = 1;
+	        		}else{
+	        			iter++;	
+	        		}
+
+	        		
+	        	}
+        	}
+
+    	}
+
+    	var print = "  ";
+    	for (i = 0; i < this.indeks_graf.length; i++) {
+    		print += this.indeks_graf[i] + " ";
+    	}
+    	console.log(print);
+
+    	for (i = 0; i < this.graf.length; i++) {
+    		var print = this.indeks_graf[i]+ " ";
+    		for (j = 0; j < this.graf.length; j++) {
+    			print += this.graf[i][j] + " ";
+    		}
+    		console.log(print);
+    	}
         
 
 	}
