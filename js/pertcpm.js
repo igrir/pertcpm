@@ -13,10 +13,10 @@ var pertcpm = {
 			 ["input","text", "span2","col_pe_", "col_pe"],
 			 ["button-hapus","button", "","col_hapus_", "col_hapus"],
 			 ["input","text", "span1","col_t_", "col_t"],
-			 ["input","text", "span1","col_es_", "col_es"],
-			 ["input","text", "span1","col_ef_", "col_ef"],
-			 ["input","text", "span1","col_ls_", "col_ls"],
-			 ["input","text", "span1","col_lf_", "col_lf"],
+			 ["input","text", "span1 tgl","col_es_", "col_es"],
+			 ["input","text", "span1 tgl","col_ef_", "col_ef"],
+			 ["input","text", "span1 tgl","col_ls_", "col_ls"],
+			 ["input","text", "span1 tgl","col_lf_", "col_lf"],
 			 ["input","text", "span1","col_sl_", "col_sl"],
 			 ["input","text", "span1","col_fs_", "col_fs"],
 			 ["input","text", "span1","col_cp_", "col_cp"],
@@ -86,6 +86,7 @@ var pertcpm = {
 	            	element.className = this.kolom[i][2];
 	            	element.id = this.kolom[i][3]+this.banyakBaris;
 
+	            	element.title = "Tanggal " + this.kolom[i][3] + this.banyakBaris;
 
 	            	cell.appendChild(element);
             	}
@@ -104,6 +105,8 @@ var pertcpm = {
  
             this.banyakBaris++;
             rowCount++;
+
+            $(".tgl").tooltip();
  
 	},
 
@@ -131,6 +134,8 @@ var pertcpm = {
 	    								  "</button>";
 
 	    						  console.log("edit " + i);		
+	            	}else{
+
 	            	}
 
             	}
