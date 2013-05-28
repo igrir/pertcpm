@@ -179,6 +179,26 @@ var pertcpm = {
         //menampilkan tombol edit
         $("#edit_btn").fadeIn();
 
+
+        var table = document.getElementById("tabel");
+        var rowCount = table.rows.length;
+
+        for (i = 1; i < rowCount; i++) {
+        	var op = $("#col_op_"+i).val();
+        	var pr = $("#col_pr_"+i).val();	
+        	var pe = $("#col_pe_"+i).val();
+        	var t = $("#col_t_"+i);
+
+
+        	op = parseInt(op);
+        	pr = parseInt(pr);
+        	pe = parseInt(pe);
+
+        	var t_hasil = (op+(4*pr)+pe)/6;
+        	console.log(t_hasil);
+        	t.val(t_hasil);
+
+        }
         
 
 	}
