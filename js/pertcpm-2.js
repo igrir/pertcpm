@@ -1,3 +1,16 @@
+//
+// ============================================================
+// Tutorial, Referensi, dan Daftar Pustaka
+// ============================================================
+//
+// http://viralpatel.net/blogs/dynamically-add-remove-rows-in-html-table-using-javascript/
+
+
+/**
+ * @fileoverview Penghitung proyek kapan dilaksanakan dengan metode PERT-CPM
+ * @author giri.prahasta@student.upi.edu (Giri Prahasta Putra)
+ */
+
 pertcpm = {};
 
 /**
@@ -67,14 +80,6 @@ pertcpm.node_data = [];
 
 
 /**
- *  Arc graf
- *  @type 
- *  @const
- */
-pertcpm.graf = [];
-
-
-/**
  *  Inisialisasi, menambah row baru, menghilangkan tombol edit
  */
 pertcpm.init = function(){
@@ -82,28 +87,7 @@ pertcpm.init = function(){
 
     $("#edit_btn").hide();
 
-    console.log(this.graf);
-}
-
-
-/**
- *  Mendapatkan indeks dari node_data
- *  @param {String} id Id dari nama Node
- *  @return {int} Indeksnya
- */
-pertcpm.findNodeIndex = function(id){
-    //cari setiap indeks di arr_node di indeks_graf untuk dimasukkan ke dalam array dua dimensi graf
-    var ketemu = false;
-    var iter = 0;
-    while (!ketemu && iter < this.node_data.length) {
-
-        if (id == this.node_data[iter].no) {
-            ketemu = true;
-        }else{
-            iter++; 
-        }   
-    }
-    return iter;
+    console.log(raph.graph);
 }
 
 
@@ -148,6 +132,7 @@ pertcpm.showEdit = function(){
         // menghilangkan kolom hapus
         $(".col_hapus").fadeIn();
 }
+
 
 /**
  *  Menambah baris baru di kolom
@@ -201,6 +186,7 @@ pertcpm.addRow = function(){
 
 }
 
+
 /**
  * Menghapus baris berdasarkan id tertentu
  */
@@ -233,7 +219,7 @@ pertcpm.deleteRow = function(id){
                 }else{
                     var cell = row.cells[j];
                     var element = cell.getElementsByTagName('input')[0]; 
-                    element.id = pertcpm.kolom[i][3]+i;
+                    element.id = pertcpm.kolom[j][3]+i;
                     element.title = "Tanggal " + pertcpm.kolom[i][3] + i;
                 }
             }
@@ -242,6 +228,7 @@ pertcpm.deleteRow = function(id){
         alert(e);
     }   
 }
+
 
 /**
  *  Animasi menampilkan tabel hasil perhitungan
@@ -287,10 +274,38 @@ pertcpm.animasiHitung = function() {
 }
 
 /**
+ * Mendapatkan indeks-indeks anak-anaknya dari node awal
+ * @param {String} id Nama id node induk di pertcpm.node_data
+ * @return {Array} Array yang berisi indeks-indeks alamat childnya di pertcpm.node_data
+ */
+pertcpm.getChild = function (id) {
+    
+    var node_index = pertcpm.findNodeIndex(id);
+    var childs = new Array();
+    
+    // lakukan perulangan sepanjang banyaknya kolom di pertcpm.graf
+    // untuk mengambil indeks-indeks mana saja yang terisi (ada angka 1)
+    for (i=0;i<pertcpm.graf.length;i++) {
+        if (pertcpm.graf[node_index][i] == 1) {
+            childs[childs.length] = i;
+        }
+    }
+    
+    return childs;
+}
+
+
+/**
  * Proses menghitung
  */
 pertcpm.hitung = function(){
-
+    
+        // penampung semua Node yang ada
+        var arrNode = new Array();
+        
+        arrNode[0] = "S";   //start
+        arrNode[1] = "F";   //finish
+        
         var table = document.getElementById("tabel");
         var rowCount = table.rows.length;
 
@@ -314,30 +329,20 @@ pertcpm.hitung = function(){
 
             //menghitung t
             var t_hasil = (op+(4*pr)+pe)/6;
-            // console.log(t_hasil);
-            //  masukin -> t.val(t_hasil);
 
             // memproses indeks untuk array dua dimensi
             var idx = i-1; //indeks
 
-            //membuat indeks baris
-            //pertcpm.indeks_graf[idx] = no.val();
-
             //membuat objek node
-            var node = new this.Node(no.val(), nama.val(), t_hasil);
-
+            //var node = new this.Node(no.val(), nama.val(), t_hasil);
+            
             //masukkan node baru ke dalam node_data
-            this.node_data[idx] = node;
+            arrNode[arrNode.length] = no.val();
         }
 
-        //membuat array dua dimensi yang kosong di graf
-        for (i = 0; i < rowCount-1; i++) {
-            pertcpm.graf[i] = new Array();
-            for (j = 0; j < rowCount-1; j++) {
-                pertcpm.graf[i][j] = 0;
-            }
-        }
-
+        //membuat graf
+        raph.createGraph(arrNode);
+        console.log("arrNodes " + arrNode);
 
         //  memasukkan kegiatan sebelumnya ke dalam array
         // bentuk array dua dimensi adalah seperti ini
@@ -368,6 +373,9 @@ pertcpm.hitung = function(){
             var arr_node = new Array();
             var ks_str = ks.val();
             var node = "";
+            
+            console.log("ke-"+i);
+            
             for (j=0; j <= ks_str.length ; j++ ) {
                 if (ks_str[j] == " " || j == ks_str.length) {
 
@@ -384,47 +392,25 @@ pertcpm.hitung = function(){
                 }
             }
 
-
-            // PROSES PEMBUATAN GRAF
-
-            //cari setiap indeks di arr_node di indeks_graf untuk dimasukkan ke dalam array dua dimensi graf
-            for (j = 0; j < arr_node.length; j++) {
-                var index_awal =  pertcpm.findNodeIndex(no.val());
-                var index_tujuan =  pertcpm.findNodeIndex(arr_node[j]);
-                
-                console.log("index_awal " + no.val() + " =  " + index_awal);
-                console.log("index_tujuan " + arr_node[j] + " =  " + index_tujuan);
-
-                pertcpm.graf[index_awal][index_tujuan] = 1;
+            
+            //jika tidak punya kegiatan sebelumnya maka ditujukan ke induk
+            if (arr_node.length == 0) {
+                raph.addArc("S", no.val());
+            }else{
+                //cari setiap indeks di arr_node di indeks_graf untuk dimasukkan ke dalam array dua dimensi graf
+                for (j = 0; j < arr_node.length; j++) {
+                    raph.addArc(arr_node[j], no.val());               
+                }    
             }
+            
 
         }
-
         
-        //print arrray
-        var print = "  ";
-        for (i = 0; i < pertcpm.node_data.length; i++) {
-            print += pertcpm.node_data[i].no + " ";
-        }
-        console.log(print);
-
-        for (i = 0; i < pertcpm.graf.length; i++) {
-            var print = pertcpm.node_data[i].no+ " ";
-            for (j = 0; j < pertcpm.graf.length; j++) {
-                print += pertcpm.graf[i][j] + " ";
-            }
-            console.log(print);
-        }
+       raph.printGraph();
+        
+        // proses forward pass
+        
         
     // menampilkan tampilan hasil perhitungan
     pertcpm.animasiHitung();
 }
-
-/*
-============================================================
-Tutorial, Referensi, dan Daftar Pustaka
-============================================================
-
-http://viralpatel.net/blogs/dynamically-add-remove-rows-in-html-table-using-javascript/
-
-*/
