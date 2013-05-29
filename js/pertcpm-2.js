@@ -386,11 +386,11 @@ pertcpm.hitung = function(){
         }
         
         //hubungkan ke finish jika tidak ada kegiatan yang dituju setelahnya
-        for (j = 0; j< 5; j++) {
+        for (j = 0; j< raph.arrNode.length; j++) {
             var childs = raph.getChild(raph.arrNode[j]);
             console.log("iterasi : " + j);
             console.log("NODE YANG DILIHAT: " + raph.arrNode[j]);
-            if (childs.length == 0) {
+            if (childs.length == 0 && raph.arrNode[j] != "F") {
                 raph.addArc(raph.arrNode[j], "F");
             }
         }

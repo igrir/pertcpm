@@ -32,7 +32,7 @@ raph.graph = [[]];
  */
 raph.createGraph = function (arrNode) {
     //masukkan semua node yang akan dibuat grafnya
-    raph.arrNode = arrNode;
+    this.arrNode = arrNode;
     
     // buat array dua dimensi membuat graf
     for (i=0;i<this.arrNode.length;i++) {
