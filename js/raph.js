@@ -32,7 +32,7 @@ raph.graph = [[]];
  */
 raph.createGraph = function (arrNode) {
     //masukkan semua node yang akan dibuat grafnya
-    this.arrNode = arrNode;
+    raph.arrNode = arrNode;
     
     // buat array dua dimensi membuat graf
     for (i=0;i<this.arrNode.length;i++) {
@@ -115,6 +115,27 @@ raph.printGraph = function(){
         
         
     }
+}
+
+/**
+ * Mendapatkan indeks-indeks anak-anaknya dari node awal
+ * @param {String} id Nama id node induk di pertcpm.node_data
+ * @return {Array} Array yang berisi indeks-indeks alamat childnya di pertcpm.node_data
+ */
+raph.getChild = function (id) {
+    
+    var node_index = raph.findNodeIndex(id);
+    var childs = new Array();
+    
+    // lakukan perulangan sepanjang banyaknya kolom di raph.graph
+    // untuk mengambil indeks-indeks mana saja yang terisi (ada angka 1)
+    for (i=0;i<this.graph.length;i++) {
+        if (this.graph[node_index][i] == 1) {
+            childs[childs.length] = i;
+        }
+    }
+    
+    return childs;
 }
 
 init = function() {

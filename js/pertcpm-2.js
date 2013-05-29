@@ -273,27 +273,6 @@ pertcpm.animasiHitung = function() {
     $("#edit_btn").show();
 }
 
-/**
- * Mendapatkan indeks-indeks anak-anaknya dari node awal
- * @param {String} id Nama id node induk di pertcpm.node_data
- * @return {Array} Array yang berisi indeks-indeks alamat childnya di pertcpm.node_data
- */
-pertcpm.getChild = function (id) {
-    
-    var node_index = pertcpm.findNodeIndex(id);
-    var childs = new Array();
-    
-    // lakukan perulangan sepanjang banyaknya kolom di pertcpm.graf
-    // untuk mengambil indeks-indeks mana saja yang terisi (ada angka 1)
-    for (i=0;i<pertcpm.graf.length;i++) {
-        if (pertcpm.graf[node_index][i] == 1) {
-            childs[childs.length] = i;
-        }
-    }
-    
-    return childs;
-}
-
 
 /**
  * Proses menghitung
@@ -403,10 +382,20 @@ pertcpm.hitung = function(){
                 }    
             }
             
-
+            
         }
         
-       raph.printGraph();
+        //hubungkan ke finish jika tidak ada kegiatan yang dituju setelahnya
+        for (j = 0; j< 5; j++) {
+            var childs = raph.getChild(raph.arrNode[j]);
+            console.log("iterasi : " + j);
+            console.log("NODE YANG DILIHAT: " + raph.arrNode[j]);
+            if (childs.length == 0) {
+                raph.addArc(raph.arrNode[j], "F");
+            }
+        }
+        
+        raph.printGraph();
         
         // proses forward pass
         
