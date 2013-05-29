@@ -1,3 +1,23 @@
+function Node(){}
+
+
+function Node(){
+	this.no="";
+	this.nama="";
+	this.ks="";
+	this.op=0;
+	this.pr=0;
+	this.pe=0;
+	this.t =0;
+	this.es=0;
+	this.ef=0;
+	this.ls=0;
+	this.lf=0;
+	this.sl=0;
+	this.fs=0;
+	this.cp=false;
+}
+
 var pertcpm = {
 
 	//tampung banyaknya baris
@@ -6,11 +26,11 @@ var pertcpm = {
 	//kolom yang ingin dicetak
 	//element, type, className, id, class column
 	kolom : [["input","text", "span1","col_no_", "col_no"],
-			 ["input","text", "span3","col_nama_", "col_nama"],
-			 ["input","text", "span4","col_ks_", "col_ks"],
-			 ["input","text", "span2","col_op_", "col_op"],
-			 ["input","text", "span2","col_pr_", "col_pr"],
-			 ["input","text", "span2","col_pe_", "col_pe"],
+			 ["input","text", "span5","col_nama_", "col_nama"],
+			 ["input","text", "span3","col_ks_", "col_ks"],
+			 ["input","text", "span1","col_op_", "col_op"],
+			 ["input","text", "span1","col_pr_", "col_pr"],
+			 ["input","text", "span1","col_pe_", "col_pe"],
 			 ["button-hapus","button", "","col_hapus_", "col_hapus"],
 			 ["input","text", "span1","col_t_", "col_t"],
 			 ["input","text", "span1 tgl","col_es_", "col_es"],
@@ -21,6 +41,7 @@ var pertcpm = {
 			 ["input","text", "span1","col_fs_", "col_fs"],
 			 ["input","text", "span1","col_cp_", "col_cp"],
 			 ],
+	node_data:[],
 	indeks_graf :[],
 	graf : [],
 	//fungsi inisialisasi
@@ -278,12 +299,13 @@ var pertcpm = {
     		var op = $("#col_op_"+i).val();		//optimis
         	var pr = $("#col_pr_"+i).val();		//probable
         	var pe = $("#col_pe_"+i).val();		//pesimis
-        	var t = $("#col_t_"+i);				//waktu
+        	var t  = $("#col_t_"+i);				//waktu
         	var ks = $("#col_ks_"+i);			//kegiatan sebelumnya
         	var no = $("#col_no_"+i);			//id kegiatan
         	var sl = $("#col_sl_"+i);			//slack
         	var fs = $("#col_fs_"+i);			//free slack
         	var cp = $("#col_cp_"+i);			//critical path
+        	var nama = $("#col_nama_"+i);			//nama
 
         	// memproses indeks untuk array dua dimensi
         	var idx = i-1; //indeks
@@ -301,6 +323,9 @@ var pertcpm = {
         		}
         	}
 
+
+        	// PROSES PEMBUATAN GRAF
+
         	//cari setiap indeks di arr_node di indeks_graf untuk dimasukkan ke dalam array dua dimensi graf
         	for (j = 0; j < arr_node.length; j++) {
         		var ketemu = false;
@@ -313,14 +338,15 @@ var pertcpm = {
 	        			this.graf[idx][iter] = 1;
 	        		}else{
 	        			iter++;	
-	        		}
-
-	        		
+	        		}	
 	        	}
         	}
-
     	}
 
+    	
+
+
+    	//print arrray
     	var print = "  ";
     	for (i = 0; i < this.indeks_graf.length; i++) {
     		print += this.indeks_graf[i] + " ";
