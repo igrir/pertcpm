@@ -324,7 +324,18 @@ pertcpm.hitung = function(){
         var arrNode = new Array();
 
         // penampung semua Node dalam bentuk objek
-        this.arrNodeObj = new Array();
+        if (this.arrNodeObj == []) {
+            this.arrNodeObj = new Array();
+        }else{
+            this.arrNodeObj = [];
+        }
+
+        //reset graph
+        raph.graph = [[]];
+
+        //reset queue
+        ruque.queue = [];
+        
 
         arrNode[0] = "S";   //start
         this.arrNodeObj[0] = new this.Node("S", "START",0);
