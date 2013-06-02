@@ -1,14 +1,15 @@
+<!DOCTYPE html>
 <html>
 	<head>
 		<script type="text/javascript" src="js/jquery-1.10.0.min.js"></script>
 		<script type="text/javascript" src="js/bootstrap.min.js"></script>
-		<script type="text/javascript" src="js/bootstrap-popover.js"></script>
-		<script type="text/javascript" src="js/bootstrap-tooltip.js"></script>
+		
 		
 		<script type="text/javascript" src="js/raph.js"></script>
+		<script type="text/javascript" src="js/ruque.js"></script>
 		<script type="text/javascript" src="js/pertcpm-2.js"></script>
+		<script type="text/javascript" src="js/pertcpm_batchparser.js"></script>
 		
-		<link rel="stylesheet" type="text/css" href="css/bootstrap-responsive.min.css"/>
 		<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
 		<link rel="stylesheet" type="text/css" href="css/pertcpm.css"/>
 
@@ -28,9 +29,9 @@
 				<h1>ProCP<small> program penentuan pengerjaan proyek dengan metode PERT-CPM</small></h1>
 			</div>
 
-			Tanggal mulai :<input type="date" id="tgl_mulai"/> 
-			Tanggal berakhir :<input type="date" id="tgl_selesai"/>
-			Lama kegiatan :<input type="text" id="tgl_mulai"/>
+			Tanggal mulai :<input type="date" id="tgl_mulai" class="span2"/> 
+			Tanggal berakhir :<span id="tgl_selesai"></span>
+			Lama kegiatan :<span id="lama_kegiatan"></span>
 			<br/>
 
 
@@ -44,7 +45,7 @@
 					</td>
 					<td class="col_ks">
 						Kegiatan sebelumnya<br/>
-						<small>(hanya 1 huruf, pisahkan dengan spasi antar nomor/id)</small>
+						<small>(hanya 1 huruf, pisahkan dengan spasi antar nomor/id, kosongkan jika tidak ada)</small>
 					</td>
 					<td class="col_op">
 						Optimis
@@ -85,11 +86,40 @@
 				</tr>
 			</table>
 
-			<button class="btn btn-success" onClick="pertcpm.addRow();" id="tambah_btn"><i class="icon-plus"></i> Tambah</button>
+			<div class="btn-group" id="tambah_btn">
+			  <button class="btn btn-success" onClick="pertcpm.addRow();" ><i class="icon-plus icon-white"></i> Tambah</button>
+			  <button class="btn dropdown-toggle btn-success" data-toggle="dropdown">
+			    <span class="caret"></span>
+			  </button>
+			  <ul class="dropdown-menu">
+			    <li>
+			    	<a href="#myModal" role="button" data-toggle="modal"><i class="icon-th-large"></i> Batch</a>
+			    </li>
+			  </ul>
+			</div>
+					
 			<button class="btn btn-warning" onClick="pertcpm.hitung();" id="hitung_btn"><i class="icon-fire"></i> Hitung</button>
 			<button class="btn btn-info"    onClick="pertcpm.showEdit();"   id="edit_btn"  ><i class="icon-edit"></i> Edit</button>
 		</div>
 
+		<!-- Modal -->
+		<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		  <div class="modal-header">
+		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+		    <h3 id="myModalLabel">Batch Input</h3>
+		  </div>
+		  <div class="modal-body">
+		  	Format:<br/>
+		    id, nama kegiatan, kegiatan sebelumnya, optimis, probable, pesimis<br/>
+
+		  	<textarea rows="5" id="batchInput"></textarea>
+
+		  </div>
+		  <div class="modal-footer">
+		    <button class="btn" data-dismiss="modal" aria-hidden="true">Batal</button>
+		    <button class="btn btn-primary" onClick="batchParse();">Proses</button>
+		  </div>
+		</div>
 	</body>
 
 </html>

@@ -129,16 +129,37 @@ raph.getChild = function (id) {
     
     // lakukan perulangan sepanjang banyaknya kolom di raph.graph
     // untuk mengambil indeks-indeks mana saja yang terisi (ada angka 1)
-    for (i=0;i<this.graph.length;i++) {
-        if (this.graph[node_index][i] == 1) {
-            childs[childs.length] = i;
+    for (x=0;x<this.graph.length;x++) {
+        if (this.graph[node_index][x] == 1) {
+            childs[childs.length] = x;
         }
     }
     
     return childs;
 }
 
-init = function() {
+/**
+ * Mendapatkan indeks-indeks induk-induknya dari node akhir
+ * @param {String} id Nama id node child di pertcpm.node_data
+ * @return {Array} Array yang berisi indeks-indeks alamat childnya di pertcpm.node_data
+ */
+raph.getParents = function (id) {
+    
+    var node_index = raph.findNodeIndex(id);
+    var parents = new Array();
+    
+    // lakukan perulangan sepanjang banyaknya kolom di raph.graph
+    // untuk mengambil indeks-indeks mana saja yang terisi (ada angka 1)
+    for (x=0;x<this.graph.length;x++) {
+        if (this.graph[x][node_index] == 1) {
+            parents[parents.length] = x;
+        }
+    }
+    
+    return parents;
+}
+
+raph.init = function() {
     raph.createGraph(["S", "F","0","1","2","3"]);
     raph.printGraph();
     

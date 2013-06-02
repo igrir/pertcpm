@@ -27,11 +27,11 @@ pertcpm.Node = function(no, nama, t){
     this.op     = 0;
     this.pr     = 0;
     this.pe     = 0;
-    this.t      = 0;
+    this.t      = t;
     this.es     = 0;
     this.ef     = 0;
-    this.ls     = 0;
-    this.lf     = 0;
+    this.ls     = 9999;
+    this.lf     = 9999;
     this.sl     = 0;
     this.fs     = 0;
     this.cp     = false;
@@ -44,6 +44,23 @@ pertcpm.Node = function(no, nama, t){
  *  @const
  */
 pertcpm.banyakBaris = 1;
+
+
+pertcpm.arrNodeObj = [];
+
+var month=new Array();
+month[0]="January";
+month[1]="February";
+month[2]="March";
+month[3]="April";
+month[4]="May";
+month[5]="June";
+month[6]="July";
+month[7]="August";
+month[8]="September";
+month[9]="October";
+month[10]="November";
+month[11]="December";
 
 
 /**
@@ -275,15 +292,45 @@ pertcpm.animasiHitung = function() {
 
 
 /**
+ * Mendapatkan objek dari id No
+ */
+pertcpm.findObjByNo = function(no){
+    var ketemu = false;
+    var i = 0;
+    var result = null;
+    while (ketemu == false && i < this.arrNodeObj.length) {
+        var node = this.arrNodeObj[i];
+        if (node.no == no) {
+            ketemu = true;
+            result = node;
+        }else{
+            i++;
+        }
+    }
+
+    if (ketemu) {
+        //lempar objek yang didapat
+        return node;
+    }
+
+}
+
+/**
  * Proses menghitung
  */
 pertcpm.hitung = function(){
     
         // penampung semua Node yang ada
         var arrNode = new Array();
-        
+
+        // penampung semua Node dalam bentuk objek
+        this.arrNodeObj = new Array();
+
         arrNode[0] = "S";   //start
+        this.arrNodeObj[0] = new this.Node("S", "START",0);
+        
         arrNode[1] = "F";   //finish
+        this.arrNodeObj[1] = new this.Node("F", "FINISH",0);
         
         var table = document.getElementById("tabel");
         var rowCount = table.rows.length;
@@ -296,30 +343,35 @@ pertcpm.hitung = function(){
             var ks   = $("#col_ks_"+i);     //kegiatan sebelumnya
             var no   = $("#col_no_"+i);     //id kegiatan
             var sl   = $("#col_sl_"+i);     //slack
-            var fs   = $("#col_fs_"+i);     //free slack
-            var cp   = $("#col_cp_"+i);     //critical path
             var nama = $("#col_nama_"+i);   //nama
 
 
-            op = parseInt(op);
-            pr = parseInt(pr);
-            pe = parseInt(pe);
+            var opVal = parseFloat(op.val());
+            var prVal = parseFloat(pr.val());
+            var peVal = parseFloat(pe.val());
 
 
-            //menghitung t
-            var t_hasil = (op+(4*pr)+pe)/6;
+            // //menghitung t
+            var t_hasil = (opVal+(4*prVal)+peVal)/6;
 
             // memproses indeks untuk array dua dimensi
             var idx = i-1; //indeks
 
             //membuat objek node
-            //var node = new this.Node(no.val(), nama.val(), t_hasil);
+            var node = new this.Node(no.val(), nama.val(), t_hasil);
+            node.op = opVal;
+            node.pr = prVal;
+            node.pe = peVal;
+            node.ks = ks.val();
+            node.nama = nama.val();
             
             //masukkan node baru ke dalam node_data
-            arrNode[arrNode.length] = no.val();
+            arrNode[arrNode.length] = node.no;                  //masukkan nama, untuk graf
+            this.arrNodeObj[this.arrNodeObj.length] = node;     //masukkan objek
         }
 
-        //membuat graf
+        // PROSES MEMBUAT GRAPH DARI ARRAY
+
         raph.createGraph(arrNode);
         console.log("arrNodes " + arrNode);
 
@@ -397,8 +449,230 @@ pertcpm.hitung = function(){
         
         raph.printGraph();
         
-        // proses forward pass
+        //------------------------------- PROSES FORWARD PASS -------------------------------
+
+        //masukkan initial proses
+        ruque.add(raph.arrNode[0]); //START
+
+
+        while (ruque.queue.length > 0) {
+
+            var node = ruque.top();
+            var nodeObj = this.findObjByNo(node);
+
+            //proses tiap anak
+            var childs = raph.getChild(node);
+
+            for (j = 0 ; j < childs.length;j++) {
+
+                console.log("CHILD: " + node + " " + raph.arrNode[childs[j]]);
+                console.log("CHILDOBJ: " + node + " " + this.arrNodeObj[childs[j]].nama);
+
+                // masukkan anak-anak dari node sekarang ke dalam queue untuk proses berikutnya
+                ruque.add(raph.arrNode[childs[j]]);
+
+                //cari objeknya
+                var childNode = this.arrNodeObj[childs[j]];
+                
+                
+                //cek jika early start yang child lebih kecil dibandingkan early finish parent
+                //jika lebih kecil maka akan dimasukkan yang lebih besar
+                if (childNode.es <= nodeObj.ef) {
+                    console.log("kecil");
+                    //early start
+                    childNode.es = parseFloat(nodeObj.ef);
+                    //early finish
+                    childNode.ef = parseFloat(parseFloat(childNode.es)+parseFloat(childNode.t));
+                }else{
+                    console.log("besar");
+                }
+                
+                // cek jika node adalah finish maka isi ls dan lf nya
+                if (childNode.no == "F") {
+                    childNode.lf = childNode.ef;
+                    childNode.ls = childNode.lf;
+                }
+
+                
+            }
+
+            // hapus node yang sudah diproses
+            ruque.pop();
+
+        }
+
+
+        //------------------------------- PROSES BACKWARD PASS -------------------------------
         
+        //masukkan initial proses
+        ruque.add(raph.arrNode[1]); //END
+
+
+        while (ruque.queue.length > 0) {
+
+            var node = ruque.top();
+            var nodeObj = this.findObjByNo(node);
+
+            //proses tiap induk
+            var parents = raph.getParents(node);
+
+            for (j = 0 ; j < parents.length;j++) {
+
+                console.log("PARENT: " + node + " " + raph.arrNode[parents[j]]);
+                console.log("PARENTOBJ: " + node + " " + this.arrNodeObj[parents[j]].nama);
+
+                // masukkan parents dari node sekarang ke dalam queue untuk proses berikutnya
+                ruque.add(raph.arrNode[parents[j]]);
+
+                //cari objeknya
+                var parentNode = this.arrNodeObj[parents[j]];
+                
+                
+                //cek jika late start yang child lebih besar dibandingkan late finish parent
+                //jika late finish parent lebih besar maka akan dimasukkan yang lebih kecil
+                if (parentNode.lf >= nodeObj.ls) {
+                    console.log("kecil");
+                    //early start
+                    parentNode.lf = parseFloat(nodeObj.ls);
+                    //early finish
+                    parentNode.ls = parseFloat(parseFloat(parentNode.lf)-parseFloat(parentNode.t));
+                }else{
+                    console.log("besar");
+                }
+                
+                
+                
+            }
+
+            // hapus node yang sudah diproses
+            ruque.pop();
+
+        }
+
+        //------------------------------- PROSES SLACK, FREE SLACK, CRITICAL PATH -------------------------------
+
+        //masukkan initial proses
+        ruque.add(raph.arrNode[0]); //START
+
+
+        while (ruque.queue.length > 0) {
+
+            var node = ruque.top();
+            var nodeObj = this.findObjByNo(node);
+
+
+            // hitung slack
+            nodeObj.sl = parseFloat(nodeObj.ls-nodeObj.es);
+            console.log(nodeObj.no + " = late start:" + nodeObj.ls + " early start:"+nodeObj.es);
+
+            //proses tiap anak
+            var childs = raph.getChild(node);
+
+            for (j = 0 ; j < childs.length;j++) {
+
+                console.log("CHILD: " + node + " " + raph.arrNode[childs[j]]);
+                console.log("CHILDOBJ: " + node + " " + this.arrNodeObj[childs[j]].nama);
+
+                // masukkan anak-anak dari node sekarang ke dalam queue untuk proses berikutnya
+                ruque.add(raph.arrNode[childs[j]]);
+
+                //cari objeknya
+                var childNode = this.arrNodeObj[childs[j]];
+
+
+                // hitung free slack
+                nodeObj.fs = nodeObj.lf-childNode.es;
+                
+            }
+
+            // cek critical path
+            if (nodeObj.sl == 0 && nodeObj.fs == 0) {
+                nodeObj.cp = true;
+            }
+
+
+            // hapus node yang sudah diproses
+            ruque.pop();
+
+        }
+
+        // TAMPILKAN SEMUANYA DI VIEW TABEL
+
+        for (i = 1; i < rowCount; i++) {
+            var op   = $("#col_op_"+i);     //optimis
+            var pr   = $("#col_pr_"+i);     //probable
+            var pe   = $("#col_pe_"+i);     //pesimis
+            var t    = $("#col_t_"+i);      //waktu
+            var ks   = $("#col_ks_"+i);     //kegiatan sebelumnya
+            var no   = $("#col_no_"+i);     //id kegiatan
+            var sl   = $("#col_sl_"+i);     //slack
+            var fs   = $("#col_fs_"+i);     //free slack
+            var cp   = $("#col_cp_"+i);     //critical path
+            var nama = $("#col_nama_"+i);   //nama
+            var es   = $("#col_es_"+i);   //Early Start
+            var ef   = $("#col_ef_"+i);   //Early Finish
+            var ls   = $("#col_ls_"+i);   //Late Start
+            var lf   = $("#col_lf_"+i);   //Late Finish
+
+
+            //indeks dari objek array
+            var index = i+1;
+
+            var obj = this.arrNodeObj[index];
+            no.val(obj.no);
+            op.val(obj.op);
+            pr.val(obj.pr);
+            pe.val(obj.pe);
+            t.val(obj.t);
+            ks.val(obj.ks);
+            sl.val(obj.sl);
+            fs.val(obj.fs);
+            cp.val(obj.cp);
+            nama.val(obj.nama);
+            es.val(obj.es);
+            ef.val(obj.ef);
+            ls.val(obj.ls);
+            lf.val(obj.lf);
+
+
+            //set data
+            var tanggal_mulai = $("#tgl_mulai").val();
+            var tanggal_obj = new Date(Date.parse(tanggal_mulai));
+
+            console.log(tanggal_obj);
+
+            var es_date = new Date(Date.parse(tanggal_mulai));
+            var ef_date = new Date(Date.parse(tanggal_mulai));
+            var ls_date = new Date(Date.parse(tanggal_mulai));
+            var lf_date = new Date(Date.parse(tanggal_mulai));
+
+            es_date.setDate(es_date.getDate()+es.val());
+            var es_date_str = es_date.getDate()+"-"+month[es_date.getMonth()]+"-"+es_date.getFullYear();
+
+            ef_date.setDate(ef_date.getDate()+ef.val());
+            var ef_date_str = ef_date.getDate()+"-"+month[ef_date.getMonth()]+"-"+ef_date.getFullYear();
+
+            ls_date.setDate(ls_date.getDate()+ls.val());
+            var ls_date_str = ls_date.getDate()+"-"+month[ls_date.getMonth()]+"-"+ls_date.getFullYear();
+
+            lf_date.setDate(lf_date.getDate()+lf.val());
+            var lf_date_str = lf_date.getDate()+"-"+month[lf_date.getMonth()]+"-"+lf_date.getFullYear();
+
+
+            es.attr('data-original-title', es_date_str);
+            ef.attr('data-original-title', ef_date_str);
+            ls.attr('data-original-title', ls_date_str);
+            lf.attr('data-original-title', lf_date_str);
+        }
+
+        //set lama kegiatan
+        $("#lama_kegiatan").html(this.arrNodeObj[1].lf + " hari");
+        //set tanggal selesai
+        var selesai_date = new Date(Date.parse(tanggal_mulai));
+        selesai_date.setDate(selesai_date.getDate()+this.arrNodeObj[1].lf);
+        var selesai_date_str = selesai_date.getDate()+"-"+month[selesai_date.getMonth()]+"-"+selesai_date.getFullYear();
+        $("#tgl_selesai").html(selesai_date_str);
+
         
     // menampilkan tampilan hasil perhitungan
     pertcpm.animasiHitung();

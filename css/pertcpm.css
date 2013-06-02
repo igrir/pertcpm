@@ -5,3 +5,7 @@
 .col_op:hover{
 	background-color: #df0000;
 }
+
+#batchInput{
+	width: 80%;
+}
